@@ -8,6 +8,11 @@
 double grausToRad(double graus){
     return graus/180 * PI;
 }
+char* find(char* s, char l){
+    while(*s != l)
+        s++;
+    return s;
+}
 void rotaAntHorario(double* x, double* y, double graus){
     graus = grausToRad(graus);
     double xTemp = *x * cos(graus) - *y * sin(graus);
@@ -34,6 +39,7 @@ void desenhaLinha(double xInic, double yInic, double xFim, double yFim){
 }
 void lind(char* s, double xPF, double yPF, double xVB, double yVB){
     while(1){
+        printf("%c", *s);
         switch (*s)
         {
         case '^':
@@ -53,6 +59,12 @@ void lind(char* s, double xPF, double yPF, double xVB, double yVB){
             xPF += xVB;
             yPF += yVB;
             break;
+        case '[':
+            lind((s+1), xPF, yPF, xVB, yVB);
+            s = find(s, ']');
+            break;
+        case ']':
+            return;
         case '\0':
             return;
         default:
@@ -63,7 +75,8 @@ void lind(char* s, double xPF, double yPF, double xVB, double yVB){
 }
 void DesenhaNaTela(){
     glClear(GL_COLOR_BUFFER_BIT);
-    lind("^>><<^", 0, 0, 0, 10);
+    lind("^^[<^][>^]^^", 0, 0, 0, 10);
+    printf("\n");
     glutSwapBuffers();
 }
 
