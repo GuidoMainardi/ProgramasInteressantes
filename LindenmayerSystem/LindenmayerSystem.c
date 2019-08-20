@@ -5,7 +5,7 @@
 
 #define PI (3.141592653589793)
 
-char* programa = "B; B:^+B+^";
+char* programa = "B; B:[^]>>>>>>>>>>>[^]>>>>>>>>>>>[^]";
 double grausToRad(double graus){
     return graus/180 * PI;
 }
@@ -115,7 +115,7 @@ void lind(char* s, double xPF, double yPF, double xVB, double yVB, double color,
 }
 void DesenhaNaTela(){
     glClear(GL_COLOR_BUFFER_BIT);
-    lind(programa, 0, 0, 0, 10, 0, 10);
+    lind(programa, 0, 0, 0, 20, 0, 10);
     printf("\n");
     glutSwapBuffers();
 }
