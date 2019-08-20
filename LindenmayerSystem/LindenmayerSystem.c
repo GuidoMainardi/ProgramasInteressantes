@@ -5,7 +5,7 @@
 
 #define PI (3.141592653589793)
 
-
+char* programa = "B; B:^+B+^";
 double grausToRad(double graus){
     return graus/180 * PI;
 }
@@ -18,8 +18,19 @@ char* findCol(char* s){
             rec --;
         s++;
     }
-    return s - 1;
+    return s - 1 ;
 }
+char* findFunc(char f){
+    char* s = programa;
+    while(*s){
+        if(*s == f)
+            if(*(s+1) == ':')
+                return s + 1;
+        s++;
+    }
+    return NULL;
+}
+
 void rotaHorario(double* x, double* y, double graus){
     graus = grausToRad(graus);
     double xTemp = *x * cos(graus) + *y * sin(graus);
@@ -36,7 +47,10 @@ void desenhaLinha(double xInic, double yInic, double xFim, double yFim, double c
     glVertex2f(xFim,yFim);
     glEnd();
 }
-void lind(char* s, double xPF, double yPF, double xVB, double yVB, double color){
+void lind(char* s, double xPF, double yPF, double xVB, double yVB, double color, int rec){
+    if(rec == 0){
+        return;
+    }
     while(1){
         printf("%c", *s);
         switch (*s)
@@ -57,7 +71,7 @@ void lind(char* s, double xPF, double yPF, double xVB, double yVB, double color)
             break;
         //começa uma recurção
         case '[':
-            lind((s+1), xPF, yPF, xVB, yVB, color);
+            lind((s+1), xPF, yPF, xVB, yVB, color, rec);
             s = findCol(s + 1);
             break;
         // encerra uma recurção
@@ -65,7 +79,7 @@ void lind(char* s, double xPF, double yPF, double xVB, double yVB, double color)
             return;
         // deixa o risco mais azul
         case '+':
-            color += 0.3;
+            color += 0.1;
             break;
         case 'p':
             xVB = xVB * 1.1;
@@ -81,19 +95,19 @@ void lind(char* s, double xPF, double yPF, double xVB, double yVB, double color)
         // alguns casos legais para ignorar
         case ' ':
             break;
-        case ':':
-            break;
         case ';':
+            break;
+        case ':':
             break;
         default:
             //começando a pensar como fazer métodos
-            /*
             if(*s >= 65 && *s <= 90){
-                if(!(*(s+1) == ':')){
-                    findFunc(*s);
+                if(*(s+1) != ':'){
+                    char* aux = findFunc(*s);
+                    lind(aux, xPF, yPF, xVB, yVB, color, rec - 1);
+                    break;
                 }
             }
-            */
             return;
         }
         s++;
@@ -101,7 +115,7 @@ void lind(char* s, double xPF, double yPF, double xVB, double yVB, double color)
 }
 void DesenhaNaTela(){
     glClear(GL_COLOR_BUFFER_BIT);
-    lind("", 0, 0, 0, 10, 0);
+    lind(programa, 0, 0, 0, 10, 0, 10);
     printf("\n");
     glutSwapBuffers();
 }
