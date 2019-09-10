@@ -1,11 +1,29 @@
+/*
+    Sistema de Lindenmayer feito por Guido Mainardi
+
+    comandos:
+    '^': faz uma linha na direção que esta "olhando"
+    '>000': rota no snetido horario o valor que vem a seguir, nesse caso 000 graus, o numero precisa ter 3 digitos e deve ser inteiro
+    '<000': rota no sentido anti-horario o valor que vem coaldo nele, nesse caso 000 graus, o numero precisa ter 3 digitos e deve ser inteiro
+    '+': torna o risco um pouco mais azul, um valor fixo
+    's1.0': muda o tamnho do risco, deve ser seguido de dois digitos deparados por ponto, nesse caso (1.0) o risco fica do mesmo tamanho
+    '[': começa uma recurção
+    ']': encerra a função
+    "X:": declara uma função, deve ser usada uma letra maiuscula (tente eviar usar 'E') seguida de ':' para declarar a função
+    "X" : chama a função que foi declarada 
+*/
 #include <GL/glut.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define PI (3.141592653589793)
 
-char* programa = "B; B:[^]>>>>>>>>>>>[^]>>>>>>>>>>>[^]";
+//programa exemplo
+char* programa = "B; B:^[<030s0.9+B][>030s0.9+B]s0.9+B";
+
+
 double grausToRad(double graus){
     return graus/180 * PI;
 }
@@ -52,7 +70,7 @@ void lind(char* s, double xPF, double yPF, double xVB, double yVB, double color,
         return;
     }
     while(1){
-        printf("%c", *s);
+        //printf("%c", *s);
         switch (*s)
         {
             // desenha a linha pra onde a "tartaruga ta apontando"
@@ -63,11 +81,15 @@ void lind(char* s, double xPF, double yPF, double xVB, double yVB, double color,
             break;
         // vira a tartaruga 10º no sentido horario
         case '>':
-            rotaHorario(&xVB, &yVB, 10);
+            s++;
+            rotaHorario(&xVB, &yVB, atoi(s));
+            s += 2;
             break;
         //vira a tartaruga 10º no sentido antHorario
         case '<':
-            rotaHorario(&xVB, &yVB, -10);
+            s++;
+            rotaHorario(&xVB, &yVB, -1 * atoi(s));
+            s += 2;
             break;
         //começa uma recurção
         case '[':
@@ -81,13 +103,12 @@ void lind(char* s, double xPF, double yPF, double xVB, double yVB, double color,
         case '+':
             color += 0.1;
             break;
-        case 'p':
-            xVB = xVB * 1.1;
-            yVB = yVB * 1.1;
-            break;
-        case 'm': 
-            xVB = xVB * 0.9;
-            yVB = yVB * 0.9;
+        //muda o tamanho do risco
+        case 's':
+            s++;
+            xVB = xVB * atof(s);
+            yVB = yVB * atof(s);
+            s += 2;
             break;
         // fim da string termina o programa
         case '\0':
@@ -100,7 +121,7 @@ void lind(char* s, double xPF, double yPF, double xVB, double yVB, double color,
         case ':':
             break;
         default:
-            //começando a pensar como fazer métodos
+            //confere se é uma letra maiuscula, se for, procura por ela e chama a função
             if(*s >= 65 && *s <= 90){
                 if(*(s+1) != ':'){
                     char* aux = findFunc(*s);
@@ -115,7 +136,11 @@ void lind(char* s, double xPF, double yPF, double xVB, double yVB, double color,
 }
 void DesenhaNaTela(){
     glClear(GL_COLOR_BUFFER_BIT);
-    lind(programa, 0, 0, 0, 20, 0, 10);
+    // chamada da função principal, os dois primeiros valores são aonde vai começar o desenho, a grade vai de 100 a -100 no x e no y
+    // os dois proximos valores são os pontos x y do vetor que vai ser escrito (nesse caso é um vetor reto pra cima de tamanho 20)
+    // o numero seguinte é o quanto de azul o risco deve ter
+    // por fim o ultimo numero é quantas recurções devem acontecer
+    lind(programa, 0, -50, 0, 20, 0, 9);
     printf("\n");
     glutSwapBuffers();
 }
