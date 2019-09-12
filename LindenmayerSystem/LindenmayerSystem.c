@@ -3,10 +3,10 @@
 
     comandos:
     '^': faz uma linha na direção que esta "olhando"
-    '>000': rota no snetido horario o valor que vem a seguir, nesse caso 000 graus, o numero precisa ter 3 digitos e deve ser inteiro
-    '<000': rota no sentido anti-horario o valor que vem coaldo nele, nesse caso 000 graus, o numero precisa ter 3 digitos e deve ser inteiro
+    '>0': rota no snetido horario o valor que vem a seguir, nesse caso 000 graus, o numero precisa  ser inteiro
+    '<0': rota no sentido anti-horario o valor que vem coaldo nele, nesse caso 0 graus, o numero precisa ser inteiro
     '+': torna o risco um pouco mais azul, um valor fixo
-    's1.0': muda o tamnho do risco, deve ser seguido de dois digitos deparados por ponto, nesse caso (1.0) o risco fica do mesmo tamanho
+    's1.0': muda o tamnho do risco, nesse caso (1.0) o risco fica do mesmo tamanho
     '[': começa uma recurção
     ']': encerra a função
     "X:": declara uma função, deve ser usada uma letra maiuscula (tente eviar usar 'E') seguida de ':' para declarar a função
@@ -21,7 +21,7 @@
 #define PI (3.141592653589793)
 
 //programa exemplo
-char* programa = "B; B:^[<030s0.9+B][>030s0.9+B]s0.9+B";
+char* programa = "B; B:^[<30s0.9+B][>30s0.9+B]s0.9+B";
 
 
 double grausToRad(double graus){
@@ -48,7 +48,12 @@ char* findFunc(char f){
     }
     return NULL;
 }
-
+char* findNext(char* s){
+    while(*s >= '0' && *s <= '9' || *s == '.'){
+        s++;
+    }
+    return (s-1);
+}
 void rotaHorario(double* x, double* y, double graus){
     graus = grausToRad(graus);
     double xTemp = *x * cos(graus) + *y * sin(graus);
@@ -70,7 +75,7 @@ void lind(char* s, double xPF, double yPF, double xVB, double yVB, double color,
         return;
     }
     while(1){
-        //printf("%c", *s);
+        printf("%c", *s);
         switch (*s)
         {
             // desenha a linha pra onde a "tartaruga ta apontando"
@@ -83,13 +88,13 @@ void lind(char* s, double xPF, double yPF, double xVB, double yVB, double color,
         case '>':
             s++;
             rotaHorario(&xVB, &yVB, atoi(s));
-            s += 2;
+            s = findNext(s);
             break;
         //vira a tartaruga 10º no sentido antHorario
         case '<':
             s++;
             rotaHorario(&xVB, &yVB, -1 * atoi(s));
-            s += 2;
+            s = findNext(s);
             break;
         //começa uma recurção
         case '[':
@@ -108,7 +113,7 @@ void lind(char* s, double xPF, double yPF, double xVB, double yVB, double color,
             s++;
             xVB = xVB * atof(s);
             yVB = yVB * atof(s);
-            s += 2;
+            s = findNext(s);
             break;
         // fim da string termina o programa
         case '\0':
